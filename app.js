@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { resolve } = require('path');
 const readline = require('readline');
 
 const rl = readline.createInterface({
@@ -6,18 +7,41 @@ const rl = readline.createInterface({
    output: process.stdout 
 });
 
-rl.question('Masukkan nama Anda: ', nama => {
-   rl.question('Masukkan nomor telepon: ', noHp => {
-      const contact = {nama, noHp};
-      const fileBuffer = fs.readFileSync('data/contacts.json', 'utf-8');
-      const json = JSON.parse(fileBuffer);
+// membuat directory data
+const dir = './data';
+if (!fs.existsSync(dir)){
+   fs.mkdirSync(dir);
+}
+// membuat file contacts.json
+const dataPath = './data/contacts.json';
+if (!fs.existsSync(dataPath)){ 
+   fs.writeFileSync(dataPath, '[]', 'utf-8');
+}
 
-      json.push(contact);
-
-      fs.writeFileSync('data/contacts.json', JSON.stringify(json));
-
-      console.log('Terima kasih sudah menginputkan data.');
-
-      rl.close();
+const tulisPertanyaan = (pertanyaan) => {
+   return new Promise((resolve, reject) => {
+      rl.question(pertanyaan, nama => {
+         resolve(nama);
+      });
    });
-});
+};
+
+const main = async () => {
+   const nama = await tulisPertanyaan('Masukkan nama: ');
+   const email = await tulisPertanyaan('Masukkan email: ');
+   const noHp = await tulisPertanyaan('Masukkan noHp: ');
+
+   const contact = {nama, email, noHp};
+   const fileBuffer = fs.readFileSync('data/contacts.json', 'utf-8');
+   const json = JSON.parse(fileBuffer);
+
+   json.push(contact);
+
+   fs.writeFileSync('data/contacts.json', JSON.stringify(json));
+
+   console.log('Terima kasih sudah menginputkan data.');
+
+   rl.close();
+} 
+
+main();
