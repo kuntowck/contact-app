@@ -1,79 +1,67 @@
-const { type } = require("os");
-const { argv } = require("process");
-const yargs = require("yargs");
-const {
-  simpanContacts,
-  listContact,
-  detailContact,
-  deleteContact,
-} = require("./contacts");
+const express = require("express");
+const expressLayouts = require("express-ejs-layouts");
+const { loadContact, detailContact } = require("./utils/contacts");
+const app = express();
+const port = 3000;
 
-// mengambil argument dari terminal
-yargs
-  .command({
-    command: "add",
-    describe: "Menambahkan contact baru",
-    builder: {
-      nama: {
-        describe: "nama lengkap",
-        demandOption: true,
-        type: "string",
-      },
-      email: {
-        describe: "email",
-        demandOption: false,
-        type: "string",
-      },
-      noTelp: {
-        describe: "no telepon",
-        demandOption: true,
-        type: "string",
-      },
-    },
-    handler(argv) {
-      simpanContacts(argv.nama, argv.email, argv.noTelp);
-    },
-  })
-  .demandCommand(); // mengatasi command line tanpa argument
+// ejs config
+app.set("view engine", "ejs");
 
-// menampilkan daftar semua nama contact
-yargs.command({
-  command: "list",
-  describe: "Menampilkan semua nama dan no telepon contact.",
-  handler() {
-    listContact();
-  },
+// third-party middleware
+app.use(expressLayouts);
+
+// built-in middleware untuk file static
+app.use(express.static("public"));
+
+app.get("/", (req, res) => {
+  // res.sendFile("./index.html", { root: __dirname });
+  const mahasiswa = [
+    {
+      nama: "Kunto Wicaksono",
+      email: "kunto.wicaksono@gmail.com",
+    },
+    {
+      nama: "Sri Indarti",
+      email: "sri.indarti@gmail.com",
+    },
+    {
+      nama: "Sultan Anugrah",
+      email: "sultan.anugrah@gmail.com",
+    },
+  ];
+
+  res.render("index", {
+    nama: "Kunto",
+    title: "Home",
+    mahasiswa,
+    layout: "layouts/main",
+  });
 });
 
-// menampilkan detail contact
-yargs.command({
-  command: "detail",
-  describe: "Menampilkan detail contact.",
-  builder: {
-    nama: {
-      describe: "nama lengkap",
-      demandOption: true,
-      type: "string",
-    },
-  },
-  handler(argv) {
-    detailContact(argv.nama);
-  },
+app.get("/about", (req, res) => {
+  res.render("about", { layout: "layouts/main", title: "About" });
 });
 
-// menghapus contact
-yargs.command({
-  command: "delete",
-  describe: "Menghapus contact berdasarkan nama.",
-  builder: {
-    nama: {
-      describe: "nama lengkap",
-      demandOption: true,
-      type: "string",
-    },
-  },
-  handler(argv) {
-    deleteContact(argv.nama);
-  },
+app.get("/contact", (req, res) => {
+  const contacts = loadContact();
+  res.render("contact", { layout: "layouts/main", title: "Contact", contacts });
 });
-yargs.parse();
+
+app.get("/contact/:nama", (req, res) => {
+  const contact = detailContact(req.params.nama);
+  res.render("detail", {
+    layout: "layouts/main",
+    title: "Detail Contact",
+    contact,
+  });
+});
+
+// menjalankan request apa pun
+app.use((req, res) => {
+  res.status(404);
+  res.send("<h1>404</h1>");
+});
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`);
+});
