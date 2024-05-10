@@ -3,6 +3,12 @@
     <div class="col-sm-8">
       <h3>Daftar Contact</h3>
 
+      <a href="contact/add" class="btn btn-primary my-2">Tambah data contact</a>
+
+      <% if (msg.length !== 0) { %>
+      <div class="alert alert-success" role="alert"><%= msg %></div>
+      <% } %>
+
       <table class="table table-hover">
         <thead>
           <tr>
@@ -29,8 +35,8 @@
             <td><%= contact.notelp %></td>
             <td>
               <a
-                href="/contact/<%= contact.nama %>"
-                class="badge rounded-pill text-bg-primary"
+                href="contact/<%= contact.nama %>"
+                class="badge rounded-pill text-bg-success"
               >
                 <i class="bi bi-info-circle"></i>
                 Detail

@@ -1,10 +1,1 @@
-[
-  { "nama": "sri", "email": "sriindarti@gmail.com", "notelp": "081234567890" },
-  {
-    "nama": "sultan",
-    "email": "sultananugrah@gmail.com",
-    "notelp": "081234509876"
-  },
-  { "nama": "reyhan", "email": "reyhan@gmail.com", "notelp": "0812332112" },
-  { "nama": "fatur", "notelp": "081236789012" }
-]
+[{"nama":"sri","email":"sriindarti@gmail.com","notelp":"081234567890"},{"nama":"sultan","email":"sultananugrah@gmail.com","notelp":"081234509876"},{"nama":"fatur","notelp":"081236789012"},{"nama":"kunto","email":"kunto312002@gmail.com","notelp":"085156655677"},{"nama":"reyhan","email":"reyhan@gmail.com","notelp":"081230987654"},{"nama":"asd","email":"asd@gmail.com","notelp":"081230987654"}]
