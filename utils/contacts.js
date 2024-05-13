@@ -43,4 +43,27 @@ const cekDuplikat = (nama) => {
   return json.find((e) => e.nama === nama);
 };
 
-module.exports = { loadContact, detailContact, addContact, cekDuplikat };
+// hapus contact
+const deleteContact = (nama) => {
+  const json = loadContact();
+  const filteredContacts = json.filter((e) => e.nama !== nama);
+  saveContacts(filteredContacts);
+};
+
+// ubah contacts
+const updateContacts = (contactBaru) => {
+  const json = loadContact();
+  const filteredContacts = json.filter((e) => e.nama !== contactBaru.oldnama);
+  delete contactBaru.oldnama;
+  filteredContacts.push(contactBaru);
+  saveContacts(filteredContacts);
+};
+
+module.exports = {
+  loadContact,
+  detailContact,
+  addContact,
+  cekDuplikat,
+  deleteContact,
+  updateContacts,
+};

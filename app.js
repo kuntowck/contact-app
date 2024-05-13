@@ -6,6 +6,8 @@ const {
   detailContact,
   addContact,
   cekDuplikat,
+  deleteContact,
+  updateContacts,
 } = require("./utils/contacts");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
@@ -92,9 +94,9 @@ app.post(
       }
 
       return true;
-    }),
-    check("email", "Email tidak valid!").isEmail(),
-    check("notelp", "Nomor telepon tidak valid!").isMobilePhone(),
+    }), // validasi duplikat nama
+    check("email", "Email tidak valid!").isEmail(), // validasi email
+    check("notelp", "Nomor telepon tidak valid!").isMobilePhone(), // validasi no. telepon
   ],
   (req, res) => {
     const errors = validationResult(req);
@@ -106,8 +108,67 @@ app.post(
         errors: errors.array(),
       });
     } else {
-      addContact(req.body); // data form
+      addContact(req.body); // data form dari add
       req.flash("msg", "Data contact berhasil ditambahkan!"); // kirim flash massage
+      res.redirect("/contact"); // menjalankan route app get contact
+    }
+  }
+);
+
+// proses delete contact
+app.get("/contact/delete/:nama", (req, res) => {
+  const contact = detailContact(req.params.nama);
+
+  // validasi contact
+  if (!contact) {
+    res.status(404);
+    res.send("<h1>404</h1>");
+  } else {
+    deleteContact(req.params.nama);
+    req.flash("msg", "Data contact berhasil dihapus!"); // kirim flash massage
+    res.redirect("/contact"); // menjalankan route app get contact
+  }
+});
+
+// halaman form ubah data contact
+app.get("/contact/edit/:nama", (req, res) => {
+  const contact = detailContact(req.params.nama);
+
+  res.render("edit-contact", {
+    layout: "layouts/main",
+    title: "Ubah Data Contact",
+    contact,
+  });
+});
+
+// proses ubah contact
+app.post(
+  "/contact/update",
+  [
+    body("nama").custom((value, { req }) => {
+      const duplikat = cekDuplikat(value);
+      if (value !== req.body.oldnama && duplikat) {
+        throw new Error("Nama contact sudah terdaftar!");
+      }
+
+      return true;
+    }), // validasi duplikat nama
+    check("email", "Email tidak valid!").isEmail(), // validasi email
+    check("notelp", "Nomor telepon tidak valid!").isMobilePhone(), // validasi no. telepon
+  ],
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      // res.status(400).json({ errors: errors.array() });
+      res.render("edit-contact", {
+        layout: "layouts/main",
+        title: "Ubah Data Contact",
+        errors: errors.array(),
+        contact: req.body,
+      });
+    } else {
+      updateContacts(req.body); // data form dari add
+      req.flash("msg", "Data contact berhasil diubah!"); // kirim flash massage
       res.redirect("/contact"); // menjalankan route app get contact
     }
   }
